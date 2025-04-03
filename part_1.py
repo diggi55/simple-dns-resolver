@@ -47,10 +47,10 @@ class Resolver:
         random.seed(1)
 
     def resolve(self):
-        query = self.build_query()
-        response, _ = self.send(query)
+        query = self.__build_query()
+        response, _ = self.__send(query)
 
-    def build_query(self):
+    def __build_query(self):
         id = random.randint(0, 65535)
         flags = 1 << 8 # only the 'Recursion Desired' flag is set
         header = Header(id=id, flags=flags)
@@ -60,7 +60,7 @@ class Resolver:
                 
         return header.to_bytes() + question.to_bytes()
     
-    def send(self, query):
+    def __send(self, query):
         # hex query for example.com:
         # 44cb01000001000000000000076578616d706c6503636f6d0000010001
         # hex query for google.com:
