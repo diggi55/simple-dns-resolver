@@ -1,5 +1,3 @@
-# implement DNS in a weekend
+# simple-dns-resolver
 
-The code for Implement DNS in a Weekend. The project's homepage is
-[https://implement-dns.wizardzines.com](https://implement-dns.wizardzines.com),
-you should start there instead of here.
+Writing a simple DNS resolver based on [this example](https://implement-dns.wizardzines.com).
