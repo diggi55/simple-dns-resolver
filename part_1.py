@@ -6,8 +6,6 @@ import random
 import socket
 
 
-# TODO: Setup linter/formatter
-
 @dataclass
 class Header:
     id: int
@@ -30,11 +28,10 @@ class Question:
 
     # TODO  there may be more query types to come ...
     # TODO Maybe use enum instead of dictionary?
-    qtypes: ClassVar =  {'A':1}
+    qtypes: ClassVar = {'A': 1}
 
     def to_bytes(self) -> bytes:
         return self.qname + struct.pack('!HH', self.qtype, self.qclass)
-
 
 
 class Resolver:
@@ -50,21 +47,21 @@ class Resolver:
 
     def __build_query(self) -> bytes:
         id = random.randint(0, 65535)
-        flags = 1 << 8 # only the 'Recursion Desired' flag is set
+        flags = 1 << 8  # only the 'Recursion Desired' flag is set
         header = Header(id=id, flags=flags)
 
         qname = self.__encode_domain_name(self.domain_name)
         question = Question(qname=qname, qtype=self.qtype)
-                
+
         return header.to_bytes() + question.to_bytes()
-    
+
     def __send(self, query: bytes, name_server: str) -> tuple[bytes, tuple]:
         # hex query for example.com:
         # 44cb01000001000000000000076578616d706c6503636f6d0000010001
         # hex query for google.com:
         # 44cb0100000100000000000006676f6f676c6503636f6d0000010001
-        #print( f"Query falsch:  {query.hex()}")
-        #print("Query korrekt: 44cb01000001000000000000076578616d706c6503636f6d0000010001")
+        # print( f"Query falsch:  {query.hex()}")
+        # print("Query korrekt: 44cb01000001000000000000076578616d706c6503636f6d0000010001")
         if query.hex() == "44cb01000001000000000000076578616d706c6503636f6d0000010001":
             print("QUERY PASST!")
         else:
@@ -74,14 +71,12 @@ class Resolver:
         sock.sendto(query, (name_server, 53))
         return sock.recvfrom(1024)
 
-
-    
     def __encode_domain_name(self, domain_name: str) -> bytes:
         encoded = b''
         for part in domain_name.encode('ascii').split(b'.'):
             encoded += bytes([len(part)]) + part
         return encoded + b'\x00'
-    
+
 
 if __name__ == "__main__":
     # TODO: Read from command line
