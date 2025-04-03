@@ -45,9 +45,9 @@ class Resolver:
         self.qtype = Question.qtypes[qtype]
         random.seed(1)
 
-    def resolve(self):
+    def query(self, name_server):
         query = self.__build_query()
-        response, _ = self.__send(query)
+        response, _ = self.__send(query, name_server)
 
     def __build_query(self):
         id = random.randint(0, 65535)
@@ -59,7 +59,7 @@ class Resolver:
                 
         return header.to_bytes() + question.to_bytes()
     
-    def __send(self, query):
+    def __send(self, query, name_server):
         # hex query for example.com:
         # 44cb01000001000000000000076578616d706c6503636f6d0000010001
         # hex query for google.com:
@@ -72,7 +72,7 @@ class Resolver:
             print("QUERY FALSCH!!!")
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(query, ("8.8.8.8", 53))
+        sock.sendto(query, (name_server, 53))
         return sock.recvfrom(1024)
 
 
@@ -88,5 +88,6 @@ if __name__ == "__main__":
     # TODO: Read from command line
     domain_name = "example.com"
     qtype = "A"
+    name_server = "8.8.8.8"
 
-    Resolver(domain_name, qtype).resolve()
+    Resolver(domain_name, qtype).query(name_server)
