@@ -39,7 +39,6 @@ class Question:
 
 
 
-# TODO Was macht @dataclass genau?? Kann ich trotzdem nen Konstruktor haben?
 class Resolver:
     def __init__(self, domain_name, qtype):
         self.domain_name = domain_name
