@@ -7,8 +7,6 @@ import socket
 
 
 # TODO: Setup linter/formatter
-# TODO: Add missing type annotations
-
 
 @dataclass
 class Header:
@@ -19,7 +17,7 @@ class Header:
     namer_servers_count: int = 0
     additional_records_count: int = 0
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
         fields = dataclasses.astuple(self)
         return struct.pack('!HHHHHH', *fields)
 
@@ -34,22 +32,23 @@ class Question:
     # TODO Maybe use enum instead of dictionary?
     qtypes: ClassVar =  {'A':1}
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
         return self.qname + struct.pack('!HH', self.qtype, self.qclass)
 
 
 
 class Resolver:
-    def __init__(self, domain_name, qtype):
-        self.domain_name = domain_name
-        self.qtype = Question.qtypes[qtype]
+    def __init__(self, domain_name: str, qtype: str):
+        self.domain_name: str = domain_name
+        self.qtype: int = Question.qtypes[qtype]
         random.seed(1)
 
-    def query(self, name_server):
+    def query(self, name_server: str) -> bytes:
         query = self.__build_query()
         response, _ = self.__send(query, name_server)
+        return response
 
-    def __build_query(self):
+    def __build_query(self) -> bytes:
         id = random.randint(0, 65535)
         flags = 1 << 8 # only the 'Recursion Desired' flag is set
         header = Header(id=id, flags=flags)
@@ -59,7 +58,7 @@ class Resolver:
                 
         return header.to_bytes() + question.to_bytes()
     
-    def __send(self, query, name_server):
+    def __send(self, query: bytes, name_server: str) -> tuple[bytes, tuple]:
         # hex query for example.com:
         # 44cb01000001000000000000076578616d706c6503636f6d0000010001
         # hex query for google.com:
@@ -77,7 +76,7 @@ class Resolver:
 
 
     
-    def __encode_domain_name(self, domain_name):
+    def __encode_domain_name(self, domain_name: str) -> bytes:
         encoded = b''
         for part in domain_name.encode('ascii').split(b'.'):
             encoded += bytes([len(part)]) + part
